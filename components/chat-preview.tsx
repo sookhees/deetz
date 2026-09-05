@@ -27,7 +27,7 @@ export function ChatPreview() {
             </span>
           </div>
         </div>
-        <div className="flex flex-col gap-4 px-5 py-6 text-sm">
+        <div className="flex min-h-96 flex-col justify-end gap-4 px-5 py-6 text-sm">
           <p className="max-w-[80%] self-end rounded-2xl rounded-br-md bg-foreground px-4 py-2.5 text-background">
             How many days of annual leave do new starters get?
           </p>
@@ -36,6 +36,19 @@ export function ChatPreview() {
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
               People › Leave policy 2026.docx
+            </span>
+          </div>
+          <p className="max-w-[80%] self-end rounded-2xl rounded-br-md bg-foreground px-4 py-2.5 text-background">
+            Does that include the shutdown days over Christmas?
+          </p>
+          <div className="flex max-w-[80%] flex-col gap-2 self-start rounded-2xl rounded-bl-md bg-muted px-4 py-2.5">
+            <p>
+              No. The three shutdown days are on top of your 25, and Facilities
+              sets the dates each year.
+            </p>
+            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
+              Facilities › Holiday closure 2026.docx
             </span>
           </div>
         </div>
