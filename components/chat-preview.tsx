@@ -15,7 +15,7 @@ import {
 
 export function ChatPreview() {
   return (
-    <div className="relative mx-auto w-full max-w-md zoom-[0.85]">
+    <div className="relative mx-auto w-full max-w-md zoom-[0.93]">
       <div
         aria-hidden
         className="absolute -inset-12 -z-10 bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] mask-[radial-gradient(ellipse_at_center,black_35%,transparent_75%)] bg-size-[14px_14px]"
@@ -34,20 +34,20 @@ export function ChatPreview() {
           </div>
         </CardHeader>
         <CardContent className="flex min-h-96 flex-col justify-end gap-4">
-          <p className="max-w-[80%] self-end rounded-2xl bg-foreground px-4 py-2.5 leading-relaxed text-background">
+          <p className="max-w-[80%] self-end rounded-3xl bg-foreground px-5 py-3 leading-relaxed text-background">
             How many days of annual leave do new starters get?
           </p>
-          <div className="flex max-w-[85%] flex-col gap-2.5 self-start rounded-2xl bg-muted px-4 py-3 leading-relaxed">
+          <div className="flex max-w-[85%] flex-col gap-2.5 self-start rounded-3xl bg-muted px-5 py-3.5 leading-relaxed">
             <p>25 days plus public holidays, rising to 28 after five years.</p>
             <span className="flex items-center gap-1.5 border-t border-border pt-2.5 text-xs text-muted-foreground">
               <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
               People › Leave policy 2026.docx
             </span>
           </div>
-          <p className="max-w-[80%] self-end rounded-2xl bg-foreground px-4 py-2.5 leading-relaxed text-background">
+          <p className="max-w-[80%] self-end rounded-3xl bg-foreground px-5 py-3 leading-relaxed text-background">
             Does that include the shutdown days over Christmas?
           </p>
-          <div className="flex max-w-[85%] flex-col gap-2.5 self-start rounded-2xl bg-muted px-4 py-3 leading-relaxed">
+          <div className="flex max-w-[85%] flex-col gap-2.5 self-start rounded-3xl bg-muted px-5 py-3.5 leading-relaxed">
             <p>
               No. The three shutdown days are on top of your 25, and Facilities
               sets the dates each year.
