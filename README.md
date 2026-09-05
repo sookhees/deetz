@@ -1,37 +1,42 @@
 # Deetz
 
-An AI assistant that answers questions from your organisation's own Microsoft 365
-content, running entirely inside your Azure tenant. No Copilot licence, no per-seat
-cost, and no data leaving the tenant.
+Talk to your business. Deetz answers questions from a person's own Microsoft 365,
+their files, SharePoint, mail, calendar and Teams, by voice or by text, running
+inside the organisation's Azure tenant. No Copilot licence, no per-seat cost, and
+nothing leaves.
 
 **Status: nothing to install yet.** Deetz is being built in public, one working
-commit at a time, from a private prototype. What is here today is a Next.js
-scaffold that starts. The rest of this page says where it is going.
+commit at a time, from a private prototype. What is here today is the landing
+page. [docs/design.md](docs/design.md) says how the rest works, and
+[docs/auth.md](docs/auth.md) covers sign-in.
 
 ## What it will be
 
-- **Embeddable.** A chat widget you drop onto an existing site or intranet page,
-  not a platform you migrate to.
-- **Answers from your content.** Questions resolve against SharePoint, OneDrive
-  and mail through Microsoft Graph, as the signed-in person, so it sees exactly
-  what they can see. Nothing is copied out or indexed somewhere else.
-- **Voice and text.** Tap to speak, or type. One conversation either way.
-- **Installs in minutes.** One `azd up` provisions everything into the Azure
-  subscription the admin is signed into, including the Azure OpenAI deployments.
-  Time to first answer is the number this project is measured on.
-- **Carries its own limits.** Per-caller rate limits, a daily spend ceiling and
-  per-user quotas live in the app itself, so what `azd up` installs is safe to
-  expose without a gateway in front of it.
+- **Your own Microsoft 365.** It searches through Microsoft's own index, reads
+  the document if it needs to, and cites what it used. Nothing is crawled,
+  indexed elsewhere or copied out.
+- **Sees what you see.** Every search runs as the signed-in person, so their
+  permissions are the boundary.
+- **The admin chooses the apps, the person chooses theirs.** The admin switches
+  on SharePoint, OneDrive, mail, calendar, Teams and people for the
+  organisation. Each person picks everything or a subset on first sign-in.
+  Mail is off until they turn it on.
+- **Speak or type.** Tap to talk and hear the answer read back as it is
+  written. One conversation either way, on a laptop or a phone.
+- **Runs in your tenant.** One `azd up` provisions the app and its Azure OpenAI
+  deployments into the subscription the admin is signed into, with a spend
+  ceiling and per-person quotas built in. You pay for tokens, not seats.
 
 ## Roadmap
 
-Roughly in the order it will land:
+In the order it will land:
 
-1. The widget shell, composer and transcript
-2. The agent route and system prompt
-3. Voice: transcription in, sentence-chunked speech out
-4. Self-service setup: `azd up`, Bicep templates, a Dockerfile
-5. The end-to-end browser suite
+1. The chat panel, typed
+2. Sign-in with Microsoft Entra
+3. Search over your Microsoft 365 through Graph
+4. Voice: transcription in, sentence-chunked speech out
+5. Self-service install: `azd up`, Bicep templates, a Dockerfile
+6. The end-to-end browser suite
 
 ## Tech stack
 
