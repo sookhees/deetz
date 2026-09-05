@@ -33,6 +33,25 @@ Roughly in the order it will land:
 4. Self-service setup: `azd up`, Bicep templates, a Dockerfile
 5. The end-to-end browser suite
 
+## Tech stack
+
+In the repo today:
+
+- [Next.js](https://nextjs.org) 16 with the App Router, [React](https://react.dev) 19 and TypeScript
+- [Tailwind CSS](https://tailwindcss.com) 4 and [shadcn/ui](https://ui.shadcn.com) on [Base UI](https://base-ui.com) primitives, with [Phosphor](https://phosphoricons.com) icons and `next-themes` for light and dark
+- [pnpm](https://pnpm.io), ESLint and Prettier
+- GitHub Actions for typecheck, lint and build on every push, with Dependabot keeping dependencies current
+- [Vercel](https://vercel.com) for the public demo
+
+Arriving with the roadmap:
+
+- [Vercel AI SDK](https://ai-sdk.dev) on [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service): one deployment each for chat, transcription and speech, all resolved server-side
+- [Microsoft Graph](https://learn.microsoft.com/graph) for the organisation's content, called as the signed-in person
+- Postgres for rate limits, spend ceilings and per-user quotas, so more than one container shares one set of counters
+- Azure Blob Storage behind a small storage adapter, with Vercel Blob as the second implementation for the demo
+- [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli) with Bicep templates, plus a Dockerfile for Azure Container Apps
+- [Puppeteer](https://pptr.dev) driving headless Chrome for the end-to-end suite
+
 ## Running the scaffold
 
 ```bash
