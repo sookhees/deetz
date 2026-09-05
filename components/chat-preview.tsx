@@ -6,7 +6,7 @@ import {
 
 export function ChatPreview() {
   return (
-    <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:justify-self-end">
+    <div className="relative mx-auto w-full max-w-md">
       <div
         aria-hidden
         className="absolute -inset-12 -z-10 bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] mask-[radial-gradient(ellipse_at_center,black_35%,transparent_75%)] bg-size-[14px_14px]"
