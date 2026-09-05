@@ -1,6 +1,6 @@
 # Deetz
 
-Talk to your business. Deetz answers questions from a person's own Microsoft 365,
+Stop searching. Start asking. Deetz answers questions from a person's own Microsoft 365,
 their files, SharePoint, mail, calendar and Teams, by voice or by text, running
 inside the organisation's Azure tenant. No Copilot licence, no per-seat cost, and
 nothing leaves.

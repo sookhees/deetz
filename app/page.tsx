@@ -15,37 +15,37 @@ const features = [
   {
     icon: MagnifyingGlassIcon,
     title: "Your own Microsoft 365",
-    body: "Files, SharePoint, mail, calendar and Teams. It searches through Microsoft's own index, reads the document if it needs to, and cites what it used.",
+    body: "Files, SharePoint, mail, calendar and Teams, through Microsoft's own index. Every answer cites its source.",
   },
   {
     icon: EyeIcon,
     title: "Sees what you see",
-    body: "Every search runs as the person asking, so their permissions are the boundary. Nothing is copied out, indexed elsewhere or sent to a vendor.",
+    body: "Every search runs as the person asking. Their permissions are the boundary. Nothing is copied out.",
   },
   {
     icon: ShieldCheckIcon,
     title: "Runs in your tenant",
-    body: "One azd up provisions the app and its Azure OpenAI deployments into your subscription, with a spend ceiling and quotas built in. You pay for tokens, not seats.",
+    body: "One azd up into your own subscription, spend ceiling included. Tokens, not seats.",
   },
   {
     icon: MicrophoneIcon,
     title: "Speak or type",
-    body: "Tap to talk and hear the answer read back as it is written. One conversation either way, on a laptop or a phone.",
+    body: "Tap to talk and hear it read back. Same conversation on a phone.",
   },
 ]
 
 const steps = [
   {
     title: "Install",
-    body: "Run azd up and consent once. Choose which apps your organisation allows and set a spend ceiling.",
+    body: "Run azd up, consent once, choose the apps.",
   },
   {
     title: "Sign in",
-    body: "People open Deetz with the Microsoft account they already have and pick what it may read for them. Mail stays off until they turn it on.",
+    body: "The Microsoft account you already have. Pick what it may read.",
   },
   {
     title: "Ask",
-    body: "Out loud or typed. It searches, reads, answers, and says where the answer came from.",
+    body: "Out loud or typed. It says where the answer came from.",
   },
 ]
 
@@ -89,14 +89,14 @@ export default function Page() {
         <div className="mx-auto w-full max-w-7xl px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
           <div className="flex flex-col items-center gap-16">
             <div className="flex max-w-3xl flex-col items-center gap-6 text-center">
-              <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-                Talk to your business.
+              <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">
+                Stop searching
+                <span className="block">Start asking</span>
               </h1>
               <p className="max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
-                {site.name} answers questions from your own Microsoft 365, your
-                files, mail, calendar and Teams, as the person asking. It runs
-                inside your Azure tenant. No Copilot licence, no per-seat cost,
-                nothing leaves.
+                {site.name} is an open-source assistant that answers from your
+                files, mail, calendar and Teams, as the person asking, inside
+                your own Azure tenant. No Copilot licence. Nothing leaves.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <a
@@ -174,8 +174,8 @@ export default function Page() {
               Nothing to install yet.
             </h2>
             <p className="max-w-md text-sm text-pretty text-muted-foreground">
-              {site.name} is being built in public, one working commit at a
-              time. This is the order it lands in.
+              Open source under MIT, built in public one working commit at a
+              time. In this order.
             </p>
           </div>
           <ol className="flex flex-col divide-y divide-border border-y border-border">
