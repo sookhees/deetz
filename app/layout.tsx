@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
-import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { ThemeProvider } from "@/components/theme-provider"
 import { site } from "@/lib/site"
@@ -32,11 +31,10 @@ export default function RootLayout({
         fontMono.variable
       )}
     >
-      <body className="flex min-h-svh flex-col">
+      <body className="min-h-svh">
         <ThemeProvider>
           <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <main className="pt-14">{children}</main>
         </ThemeProvider>
       </body>
     </html>
