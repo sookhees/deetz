@@ -154,14 +154,78 @@ behind a switch one day without anything else noticing.
 - The chat call is the AI SDK's `streamText` with tools whose `execute` runs
   on the server. The person's Graph token reaches `execute` through the tools
   context. The model has no field it could put a token in.
-- Transcription, chat and speech are resolved through a provider registry so
-  no call site names a model, and the browser can never choose one.
 - A few steps per turn are allowed, so the model can search again if the first
   query missed.
 - Every number, date and name in an answer comes from a tool result in this
   conversation. If nothing useful came back, it says so.
-- Spoken replies are synthesised per sentence and queued through one `<audio>`
-  element created inside the first tap.
+
+## Voice and models
+
+Azure OpenAI only. Three deployments in the organisation's subscription, all
+reached through the AI SDK's Azure provider by deployment name, so no call
+site names a model and the browser can never choose one:
+
+| Job | Deployment | AI SDK call |
+| --- | --- | --- |
+| Hear | `gpt-4o-mini-transcribe` | `azure.transcription(...)` |
+| Think | the chat model: gpt-oss-120b by default, or a stronger model where a language or the routing needs it | `azure(...)` |
+| Speak | `gpt-4o-mini-tts` | `azure.speech(...)` |
+
+A spoken turn is `transcribe()` then `streamText()` then `generateSpeech()`,
+each a stable API. A typed turn touches only the chat deployment. Spoken
+replies are synthesised one sentence at a time as the text streams and
+queued through one `<audio>` element created inside the first tap, so the
+first sentence plays while the rest is still being written.
+
+The chat model's reasoning is filtered before display and before speech. On
+Azure, gpt-oss can emit its reasoning as ordinary text rather than as a
+reasoning part; the transcript code and the speech queue treat it as such.
+
+Cost, from Azure's retail prices for a global deployment: gpt-oss-120b is
+$0.15 in and $0.60 out per million tokens; transcription is about $0.003 a
+minute of audio; speech is about $0.015 a minute of audio. A typed question
+with about 5,000 tokens of prompt, tools, history and results comes to about
+a tenth of a cent; a spoken one with a fifteen-second reply to about half a
+cent, two thirds of it the speech. That is roughly half the cost of the
+realtime mini model and a sixth of the full one, which is why the limits
+degrade voice before text. These are the numbers behind the model-rates
+table that enforces the spend ceiling.
+
+The voice turn is one port: speak a question, hear the answer. The pipeline
+sits behind it.
+
+## Languages
+
+Hearing and answering come free with the models: transcription detects the
+language spoken, the chat model reads it directly and, by a rule in the
+prompt, answers in the language the person used. Its internal reasoning is
+mostly English whatever the input, which nobody sees. Speech follows the
+text. Coverage is strong in the thirty or so major languages, usable in about
+a hundred, and weaker beyond, and speech quality lags text in the smaller
+ones.
+
+Three ports stay open so a language is a row in a table rather than code:
+
+- `transcribe(audio, language?)`: the Azure OpenAI model now, with the
+  person's language as a hint or auto-detect when unset.
+- `speak(text, language)`: the Azure OpenAI voice now. Azure AI Speech is
+  not an AI SDK provider, but its interfaces are one method each, so a
+  dedicated voice for a language is a small adapter behind the same call.
+- `answer(...)`: the chat deployment through the registry, a per-deployment
+  choice.
+
+The language table has one row per language: code, recognition locale,
+voice, screen-strings file. The admin sets the organisation's main language
+once and ticks which rows are on. The person's language comes from their
+browser or their setting, with "auto" for people who switch mid-conversation.
+
+The one place language has to be managed is the search query. Microsoft's
+index matches text, so a Punjabi question about an English document needs an
+English query. The prompt says: write search queries in the organisation's
+main language, keep names as they appear, and if nothing comes back, try
+again in the question's language. The regression suite gets a column per
+enabled language, so the answer-language rule and the query rule are proved
+per language rather than assumed.
 
 ## Staying inside Graph's limits
 
@@ -209,8 +273,6 @@ import, so the build needs none of them and CI runs without secrets.
    issued to the person for Deetz.
 6. A widget for pages outside Deetz's domain, as an iframe with a small
    loader.
-7. A native phone app as a thin wrapper, if anyone needs push notifications.
-   Until then the browser is the phone app.
 
 ## Open questions
 
