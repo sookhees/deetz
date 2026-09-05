@@ -27,12 +27,11 @@ scaffold that starts. The rest of this page says where it is going.
 
 Roughly in the order it will land:
 
-1. Continuous integration
-2. The widget shell, composer and transcript
-3. The agent route and system prompt
-4. Voice: transcription in, sentence-chunked speech out
-5. Self-service setup: `azd up`, Bicep templates, a Dockerfile
-6. The end-to-end browser suite
+1. The widget shell, composer and transcript
+2. The agent route and system prompt
+3. Voice: transcription in, sentence-chunked speech out
+4. Self-service setup: `azd up`, Bicep templates, a Dockerfile
+5. The end-to-end browser suite
 
 ## Running the scaffold
 

@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The fast signal. A type error should not wait behind a browser download,
+  # so this job stays free of anything slow. An `e2e` job joins this file
+  # when the browser harness is ported: it builds again and drives headless
+  # Chrome against `next start`, and the duplicated build buys independent
+  # failures.
+  #
+  # No secrets. Every `process.env` read in the app sits inside a function,
+  # so nothing resolves at build time. Keep it that way: the moment a module
+  # reads env at import, CI needs secrets and fork pull requests stop building.
+  verify:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # `next build` type-checks, but last, after minutes of compiling.
+      # tsc fails in seconds on the same error.
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build
