@@ -16,16 +16,12 @@ import {
 export function ChatPreview() {
   return (
     <div className="relative mx-auto w-full max-w-md zoom-[0.93]">
-      <div
-        aria-hidden
-        className="absolute -inset-12 -z-10 bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] mask-[radial-gradient(ellipse_at_center,black_35%,transparent_75%)] bg-size-[14px_14px]"
-      />
       <Card
         role="img"
         aria-label="A preview of the Deetz chat panel answering one question from Outlook and one from a SharePoint document."
       >
         <CardHeader className="flex flex-row items-center gap-3 border-b">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground text-sm font-bold text-background">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-chart-3 text-sm font-bold text-background dark:bg-chart-2">
             d
           </span>
           <div className="flex flex-col">
@@ -43,7 +39,10 @@ export function ChatPreview() {
               summary by Friday.
             </p>
             <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border bg-background py-1 pr-3 pl-2 text-xs font-medium">
-              <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
+              <FileTextIcon
+                className="size-3.5 shrink-0 text-chart-3 dark:text-chart-2"
+                aria-hidden
+              />
               Outlook › Re: Q3 budget
             </span>
           </div>
@@ -56,7 +55,10 @@ export function ChatPreview() {
               be booked in premium economy.
             </p>
             <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border bg-background py-1 pr-3 pl-2 text-xs font-medium">
-              <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
+              <FileTextIcon
+                className="size-3.5 shrink-0 text-chart-3 dark:text-chart-2"
+                aria-hidden
+              />
               Finance › Travel policy 2026.docx
             </span>
           </div>
@@ -68,12 +70,12 @@ export function ChatPreview() {
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground">
             <MicrophoneIcon className="size-4" aria-hidden />
           </span>
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-chart-3 text-background dark:bg-chart-2">
             <ArrowUpIcon className="size-4" aria-hidden />
           </span>
         </CardFooter>
       </Card>
-      <p className="mt-4 text-center font-mono text-xs text-muted-foreground">
+      <p className="mt-4 text-center font-mono text-xs text-chart-3 dark:text-chart-2">
         Preview
       </p>
     </div>
