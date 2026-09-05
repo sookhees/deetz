@@ -63,13 +63,6 @@ export default function Page() {
       <section className="mx-auto w-full max-w-7xl overflow-hidden px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
         <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-12">
           <div className="flex flex-col gap-6">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
-              <span
-                className="size-1.5 rounded-full bg-foreground"
-                aria-hidden
-              />
-              Open source, building in public
-            </span>
             <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
               Answers from your Microsoft 365, inside your own tenant.
             </h1>
