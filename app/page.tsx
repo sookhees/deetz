@@ -60,7 +60,7 @@ const roadmap = [
 export default function Page() {
   return (
     <>
-      <section className="mx-auto w-full max-w-5xl px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
+      <section className="mx-auto w-full max-w-7xl px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
         <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-12">
           <div className="flex flex-col gap-6">
             <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
@@ -105,7 +105,7 @@ export default function Page() {
       </section>
 
       <section className="border-y border-border">
-        <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
           {features.map(({ icon: Icon, title, body }) => (
             <div key={title} className="flex flex-col gap-3 bg-background p-6">
               <Icon className="size-5 text-muted-foreground" aria-hidden />
@@ -118,7 +118,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-5xl px-6 py-20 sm:py-28">
+      <section className="mx-auto w-full max-w-7xl px-6 py-20 sm:py-28">
         <div className="flex flex-col gap-12">
           <div className="flex flex-col gap-3">
             <p className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
@@ -145,7 +145,7 @@ export default function Page() {
       </section>
 
       <section className="border-t border-border">
-        <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-10 px-6 py-20 sm:grid-cols-2 sm:py-28">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-6 py-20 sm:grid-cols-2 sm:py-28">
           <div className="flex flex-col gap-3">
             <p className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
               Status
