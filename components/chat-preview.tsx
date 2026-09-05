@@ -37,9 +37,9 @@ export function ChatPreview() {
           <p className="max-w-[80%] self-end rounded-3xl bg-foreground px-5 py-3 leading-relaxed text-background">
             How many days of annual leave do new starters get?
           </p>
-          <div className="flex max-w-[85%] flex-col gap-2.5 self-start rounded-3xl bg-muted px-5 py-3.5 leading-relaxed">
+          <div className="flex max-w-[85%] flex-col gap-3 self-start rounded-3xl bg-muted px-5 py-3.5 leading-relaxed">
             <p>25 days plus public holidays, rising to 28 after five years.</p>
-            <span className="flex items-center gap-1.5 border-t border-border pt-2.5 text-xs text-muted-foreground">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border bg-background py-1 pr-3 pl-2 text-xs font-medium">
               <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
               People › Leave policy 2026.docx
             </span>
@@ -47,12 +47,12 @@ export function ChatPreview() {
           <p className="max-w-[80%] self-end rounded-3xl bg-foreground px-5 py-3 leading-relaxed text-background">
             Does that include the shutdown days over Christmas?
           </p>
-          <div className="flex max-w-[85%] flex-col gap-2.5 self-start rounded-3xl bg-muted px-5 py-3.5 leading-relaxed">
+          <div className="flex max-w-[85%] flex-col gap-3 self-start rounded-3xl bg-muted px-5 py-3.5 leading-relaxed">
             <p>
               No. The three shutdown days are on top of your 25, and Facilities
               sets the dates each year.
             </p>
-            <span className="flex items-center gap-1.5 border-t border-border pt-2.5 text-xs text-muted-foreground">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border bg-background py-1 pr-3 pl-2 text-xs font-medium">
               <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
               Facilities › Holiday closure 2026.docx
             </span>
