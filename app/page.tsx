@@ -1,9 +1,9 @@
 import {
-  AppWindowIcon,
   ArrowUpRightIcon,
   EyeIcon,
-  GaugeIcon,
   GithubLogoIcon,
+  MagnifyingGlassIcon,
+  MicrophoneIcon,
   ShieldCheckIcon,
 } from "@phosphor-icons/react/ssr"
 
@@ -13,47 +13,48 @@ import { site } from "@/lib/site"
 
 const features = [
   {
-    icon: ShieldCheckIcon,
-    title: "Runs in your tenant",
-    body: "One azd up provisions the app and its Azure OpenAI deployments into the subscription you are signed into. Nothing is hosted by anyone else.",
+    icon: MagnifyingGlassIcon,
+    title: "Your own Microsoft 365",
+    body: "Files, SharePoint, mail, calendar and Teams. It searches through Microsoft's own index, reads the document if it needs to, and cites what it used.",
   },
   {
     icon: EyeIcon,
-    title: "Sees what they see",
-    body: "Questions go through Microsoft Graph as the signed-in person, with their permissions. Nothing is copied out or indexed elsewhere.",
+    title: "Sees what you see",
+    body: "Every search runs as the person asking, so their permissions are the boundary. Nothing is copied out, indexed elsewhere or sent to a vendor.",
   },
   {
-    icon: AppWindowIcon,
-    title: "Embeds in a page",
-    body: "A chat widget for an intranet or a site. Ask out loud or type, and it is one conversation either way.",
+    icon: ShieldCheckIcon,
+    title: "Runs in your tenant",
+    body: "One azd up provisions the app and its Azure OpenAI deployments into your subscription, with a spend ceiling and quotas built in. You pay for tokens, not seats.",
   },
   {
-    icon: GaugeIcon,
-    title: "Carries its own limits",
-    body: "Rate limits, a daily spend ceiling and per-user quotas live in the app, so what you install is safe to expose.",
+    icon: MicrophoneIcon,
+    title: "Speak or type",
+    body: "Tap to talk and hear the answer read back as it is written. One conversation either way, on a laptop or a phone.",
   },
 ]
 
 const steps = [
   {
     title: "Install",
-    body: "Run azd up. Bicep provisions the app, its database and the model deployments into your tenant.",
+    body: "Run azd up and consent once. Choose which sources your organisation allows and set a spend ceiling.",
   },
   {
-    title: "Embed",
-    body: "Drop the widget onto a page. People sign in with the Entra ID accounts they already have.",
+    title: "Sign in",
+    body: "People open Deetz with the Microsoft account they already have and pick what it may read for them. Mail stays off until they turn it on.",
   },
   {
     title: "Ask",
-    body: "They ask in their own words, out loud or typed, and get an answer from your own content.",
+    body: "Out loud or typed. It searches, reads, answers, and says where the answer came from.",
   },
 ]
 
 const roadmap = [
-  "The widget shell, composer and transcript",
-  "The agent route and system prompt",
+  "The chat panel, typed",
+  "Sign-in with Microsoft Entra",
+  "Search over your Microsoft 365 through Graph",
   "Voice: transcription in, sentence-chunked speech out",
-  "Self-service setup: azd up, Bicep templates, a Dockerfile",
+  "Self-service install: azd up, Bicep templates, a Dockerfile",
   "The end-to-end browser suite",
 ]
 
@@ -61,18 +62,18 @@ export default function Page() {
   return (
     <>
       <section className="mx-auto w-full max-w-7xl overflow-hidden px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
-        <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-12">
-          <div className="flex flex-col gap-6">
-            <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-              Answers from your Microsoft 365, inside your own tenant.
+        <div className="flex flex-col items-center gap-16">
+          <div className="flex max-w-3xl flex-col items-center gap-6 text-center">
+            <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
+              Talk to your business.
             </h1>
-            <p className="max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">
-              {site.name} is an AI assistant that answers questions from
-              SharePoint, OneDrive and mail, as the person asking. It runs on
-              your Azure subscription. No Copilot licence, no per-seat cost, no
-              data leaving the tenant.
+            <p className="max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
+              {site.name} answers questions from your own Microsoft 365, your
+              files, mail, calendar and Teams, as the person asking. It runs
+              inside your Azure tenant. No Copilot licence, no per-seat cost,
+              nothing leaves.
             </p>
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <a
                 href={site.repo}
                 target="_blank"
@@ -83,12 +84,12 @@ export default function Page() {
                 View on GitHub
               </a>
               <a
-                href={`${site.repo}#roadmap`}
+                href={`${site.repo}/blob/main/docs/design.md`}
                 target="_blank"
                 rel="noreferrer"
                 className={buttonVariants({ variant: "ghost", size: "lg" })}
               >
-                Read the roadmap
+                Read the design
                 <ArrowUpRightIcon data-icon="inline-end" aria-hidden />
               </a>
             </div>
@@ -147,8 +148,8 @@ export default function Page() {
               Nothing to install yet.
             </h2>
             <p className="max-w-md text-sm text-pretty text-muted-foreground">
-              {site.name} is being built one working commit at a time, from a
-              private prototype. This is the order it will land in.
+              {site.name} is being built in public, one working commit at a
+              time. This is the order it lands in.
             </p>
           </div>
           <ol className="flex flex-col divide-y divide-border border-y border-border">

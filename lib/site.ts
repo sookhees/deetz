@@ -1,6 +1,6 @@
 export const site = {
   name: "Deetz",
   description:
-    "An open-source AI assistant that answers from your organisation's Microsoft 365 content, running inside your own Azure tenant.",
+    "Talk to your business. An open-source assistant that answers from your own Microsoft 365, files, mail, calendar and Teams, running inside your Azure tenant.",
   repo: "https://github.com/sookhees/deetz",
 } as const
