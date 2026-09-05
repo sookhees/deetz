@@ -80,26 +80,71 @@ choice is saved to their account and lives in their settings from then on.
 7. The turn is logged: the question, the queries the model formed, what came
    back, the citation, and a thumbs up or down if given.
 
-## Apps are tools
+## The agent and its functions
 
-Each app is one tool with a description Deetz wrote. The model routes on the
-description and composes the query itself.
+The model is the agent in the middle. We write the functions, one per app,
+each small and fixed. The model chooses between them and writes the query.
+The AI SDK runs the loop.
 
-| App | Graph call |
-| --- | --- |
-| SharePoint | Search, `site` and `listItem` and `driveItem` |
-| OneDrive | Search, `driveItem` in the person's drive |
-| Outlook mail | Search, `message`; inbox listing filtered to unread for "anything new" |
-| Outlook calendar | Calendar view for a date range |
-| Teams | Search, `chatMessage` |
-| People | Search, `person` |
+### What we write
+
+Eight functions. Each is one Graph request with the entity type hard-coded,
+and each returns its results shaped for the model.
+
+| Function | What it does | Graph call |
+| --- | --- | --- |
+| `searchSharePoint(query)` | Sites, pages, lists, documents | search, `driveItem` `listItem` `site` |
+| `searchOneDrive(query)` | The person's own files | search, `driveItem` in their drive |
+| `searchMail(query)` | Messages by sender, subject, words | search, `message` |
+| `newMail()` | What has arrived since they last looked | inbox listing, unread, newest first |
+| `searchTeams(query)` | Chats and channel messages they are in | search, `chatMessage` |
+| `calendar(from, to)` | What is on in a date range | calendar view |
+| `findPerson(query)` | Who someone is, their role, their manager | search, `person` |
+| `readDocument(id)` | Full text of one result, after a search | file download, text extracted on the server |
+
+A function knows its endpoint and its entity type. It knows nothing about the
+question. Graph only lets some entity types share one request, files and
+sites together but mail, Teams and calendar each on their own, which is why
+one function per app is the natural shape.
+
+Beyond the functions, three things:
+
+- **A description per function**, one paragraph, written to route rather
+  than to describe. "Search Teams chats and channel messages. Use when the
+  question is about a chat, a channel, or something someone said in Teams."
+  This is the part that gets tuned.
+- **The system prompt.** Who the assistant is, cite only what a tool
+  returned, say so when nothing came back, keep spoken answers short, and
+  what to do when asked for something it has no function for: say it cannot
+  yet, and do the part it can.
+- **The wiring.** Which functions are in the list for this person, from
+  their switches and the admin's. A function that is not in the list does
+  not exist as far as the model is concerned.
+
+### What the model does
+
+Given the list, it can answer a question with a structured call instead of
+text. For "what did Priya say in Teams about the budget?" its reply is:
+
+```json
+{ "name": "searchTeams", "arguments": { "query": "Priya budget" } }
+```
+
+It picked the function whose description fitted, and it composed the query.
+No code of ours reads the question or decides which app it is about. Our
+code runs the function, hands the results back, and the model either
+answers, calls a second function if the first came up empty, reads a
+document by id, or asks which of two apps the person meant.
 
 Mail queries use the syntax of the Outlook search box, so the model can form
-`from:priya budget` and get what a person would. One more tool reads a
-document by id after a search.
+`from:priya budget` and get what a person would.
 
-An app that is off, for the person or for the organisation, is a tool the
-model never sees. It cannot call what it cannot see, so it never offers it.
+### Adding an app
+
+One more row in the table: one function, one description, one switch on the
+admin page and the person's page. Nothing above the function layer changes,
+which is also what lets a Microsoft-provided tool server replace a function
+behind a switch one day without anything else noticing.
 
 ## Under the hood
 
