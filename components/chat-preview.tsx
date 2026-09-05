@@ -34,20 +34,20 @@ export function ChatPreview() {
           </div>
         </CardHeader>
         <CardContent className="flex min-h-96 flex-col justify-end gap-4">
-          <p className="max-w-[80%] self-end rounded-3xl bg-foreground px-4 py-2.5 leading-relaxed text-background">
+          <p className="max-w-[80%] self-end rounded-lg bg-foreground px-4 py-2.5 leading-relaxed text-background">
             How many days of annual leave do new starters get?
           </p>
-          <div className="flex max-w-[85%] flex-col gap-3 self-start rounded-3xl bg-muted px-4 py-3 leading-relaxed">
+          <div className="flex max-w-[85%] flex-col gap-3 self-start rounded-lg bg-muted px-4 py-3 leading-relaxed">
             <p>25 days plus public holidays, rising to 28 after five years.</p>
             <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border bg-background py-1 pr-3 pl-2 text-xs font-medium">
               <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
               People › Leave policy 2026.docx
             </span>
           </div>
-          <p className="max-w-[80%] self-end rounded-3xl bg-foreground px-4 py-2.5 leading-relaxed text-background">
+          <p className="max-w-[80%] self-end rounded-lg bg-foreground px-4 py-2.5 leading-relaxed text-background">
             Does that include the shutdown days over Christmas?
           </p>
-          <div className="flex max-w-[85%] flex-col gap-3 self-start rounded-3xl bg-muted px-4 py-3 leading-relaxed">
+          <div className="flex max-w-[85%] flex-col gap-3 self-start rounded-lg bg-muted px-4 py-3 leading-relaxed">
             <p>
               No. The three shutdown days are on top of your 25, and Facilities
               sets the dates each year.
