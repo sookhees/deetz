@@ -6,8 +6,8 @@ needs updating. Sign-in has its own page: [auth.md](auth.md).
 
 ## What it is
 
-Talk to your business. Deetz answers questions from a person's own Microsoft
-365, their files, SharePoint, mail, calendar and Teams, by voice or by text,
+Stop searching, start asking. Deetz answers questions from a person's own
+Microsoft 365, their files, SharePoint, mail, calendar and Teams, by voice or by text,
 running inside the organisation's Azure tenant. It searches what the person can
 already see, reads the document if it needs to, answers, and says where the
 answer came from.
@@ -31,8 +31,11 @@ account they already have.
    registration, and prints one consent link.
 2. **Consent.** One click, for the delegated read scopes listed in
    [auth.md](auth.md). Every scope is "as the signed-in person".
-3. **Choose the apps.** The admin page lists what Deetz can read from, each
-   with a switch:
+3. **Choose the apps.** The admin is whoever holds the `Deetz.Admin` app
+   role, which the install creates on the app registration and the admin
+   assigns to themselves or to a group in Entra. The token carries it as a
+   claim, Deetz checks the claim, and it is revoked where it was granted.
+   The admin page lists what Deetz can read from, each with a switch:
 
    | App | What it gives people |
    | --- | --- |
@@ -106,6 +109,34 @@ A function knows its endpoint and its entity type. It knows nothing about the
 question. Graph only lets some entity types share one request, files and
 sites together but mail, Teams and calendar each on their own, which is why
 one function per app is the natural shape.
+
+### Reading a document
+
+Search finds the document; reading it is a second step, taken only when the
+snippet is not enough. Nothing is indexed by us. One document is fetched per
+question, read in memory, and discarded.
+
+Where the text comes from depends on the app:
+
+| App | Read call | Text from |
+| --- | --- | --- |
+| Mail, calendar, Teams | Graph | the response |
+| SharePoint pages, lists | Graph | the response |
+| Excel | Graph's workbook API | the response, as rows |
+| Word, PowerPoint, PDF | Graph's content call with `?format=pdf` | one PDF text library on the server |
+
+Graph converts Word and PowerPoint to PDF server-side on that call, so the
+server needs a single extractor, chosen when the code is written and
+swappable behind `readDocument`. The Copilot Retrieval API would return text
+extracts through Graph directly, but it needs a Copilot seat per person, so
+it is not used.
+
+A long document never goes to the model whole. The passages around the
+search terms go, capped at a few thousand tokens, and the citation still
+points at the document. Spreadsheets go as rows, capped, preferring a named
+table when there is one. Any arithmetic over them is done by code, either
+Excel's own functions through the workbook API or a small calculate step on
+the server, and the model reads the result. It never does the adding.
 
 Beyond the functions, three things:
 
@@ -274,12 +305,10 @@ import, so the build needs none of them and CI runs without secrets.
 6. A widget for pages outside Deetz's domain, as an iframe with a small
    loader.
 
-## Open questions
+## Next
 
-- A Microsoft 365 tenant to develop against, with a few users, some SharePoint
-  content and mailboxes. Creating it is a portal step; populating it is
-  scripted.
-- Which library extracts text from Word, PowerPoint and PDF on the server, and
-  how much of a long document to hand the model.
-- How the admin is identified: the first person in, or an Entra group named at
-  install.
+A Microsoft 365 tenant to develop against. Creating it and attaching a
+Microsoft 365 licence is a portal step. Everything after is a script in the
+repo: a few users, a team site with some documents, a couple of mailbox
+messages, the app registration with its permissions and consent. Anyone with
+a tenant can run it, which is how a contributor gets a working copy.
