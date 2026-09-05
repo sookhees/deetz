@@ -28,20 +28,20 @@ export function ChatPreview() {
           </div>
         </div>
         <div className="flex min-h-96 flex-col justify-end gap-4 px-5 py-6 text-sm">
-          <p className="max-w-[80%] self-end rounded-2xl rounded-br-md bg-foreground px-4 py-2.5 text-background">
+          <p className="max-w-[80%] self-end rounded-2xl bg-foreground px-5 py-3 text-background">
             How many days of annual leave do new starters get?
           </p>
-          <div className="flex max-w-[80%] flex-col gap-2 self-start rounded-2xl rounded-bl-md bg-muted px-4 py-2.5">
+          <div className="flex max-w-[80%] flex-col gap-2 self-start rounded-2xl bg-muted px-5 py-3">
             <p>25 days plus public holidays, rising to 28 after five years.</p>
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
               People › Leave policy 2026.docx
             </span>
           </div>
-          <p className="max-w-[80%] self-end rounded-2xl rounded-br-md bg-foreground px-4 py-2.5 text-background">
+          <p className="max-w-[80%] self-end rounded-2xl bg-foreground px-5 py-3 text-background">
             Does that include the shutdown days over Christmas?
           </p>
-          <div className="flex max-w-[80%] flex-col gap-2 self-start rounded-2xl rounded-bl-md bg-muted px-4 py-2.5">
+          <div className="flex max-w-[80%] flex-col gap-2 self-start rounded-2xl bg-muted px-5 py-3">
             <p>
               No. The three shutdown days are on top of your 25, and Facilities
               sets the dates each year.
@@ -53,7 +53,7 @@ export function ChatPreview() {
           </div>
         </div>
         <div className="flex items-center gap-2 border-t border-border px-4 py-4">
-          <span className="flex-1 truncate rounded-full border border-input px-4 py-2.5 text-sm text-muted-foreground">
+          <span className="flex h-10 flex-1 items-center rounded-full border border-input px-4 text-sm text-muted-foreground">
             Ask about anything in your tenant
           </span>
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground">
