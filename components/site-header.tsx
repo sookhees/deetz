@@ -11,7 +11,7 @@ export function SiteHeader() {
         <Link href="/" className="text-xl font-bold tracking-tight">
           deetz
         </Link>
-        <nav className="flex items-center gap-1">
+        <nav className="-mr-3 flex items-center gap-1">
           <a
             href={site.repo}
             target="_blank"

@@ -60,7 +60,7 @@ const roadmap = [
 export default function Page() {
   return (
     <>
-      <section className="mx-auto w-full max-w-7xl px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
+      <section className="mx-auto w-full max-w-7xl overflow-hidden px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
         <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-12">
           <div className="flex flex-col gap-6">
             <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
