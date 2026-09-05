@@ -4,6 +4,15 @@ import {
   MicrophoneIcon,
 } from "@phosphor-icons/react/ssr"
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+
 export function ChatPreview() {
   return (
     <div className="relative mx-auto w-full max-w-md">
@@ -11,23 +20,20 @@ export function ChatPreview() {
         aria-hidden
         className="absolute -inset-12 -z-10 bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] mask-[radial-gradient(ellipse_at_center,black_35%,transparent_75%)] bg-size-[14px_14px]"
       />
-      <div
+      <Card
         role="img"
         aria-label="A preview of the Deetz chat panel answering a question from a SharePoint document."
-        className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
       >
-        <div className="flex items-center gap-3 border-b border-border px-5 py-4">
-          <span className="flex size-9 items-center justify-center rounded-full bg-foreground text-sm font-bold text-background">
+        <CardHeader className="flex flex-row items-center gap-3 border-b">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground text-sm font-bold text-background">
             d
           </span>
           <div className="flex flex-col">
-            <span className="text-sm leading-tight font-medium">deetz</span>
-            <span className="text-xs text-muted-foreground">
-              Answers from your Microsoft 365
-            </span>
+            <CardTitle>deetz</CardTitle>
+            <CardDescription>Answers from your Microsoft 365</CardDescription>
           </div>
-        </div>
-        <div className="flex min-h-96 flex-col justify-end gap-4 px-5 py-6 text-sm">
+        </CardHeader>
+        <CardContent className="flex min-h-96 flex-col justify-end gap-4">
           <p className="max-w-[80%] self-end rounded-2xl bg-foreground px-5 py-3 text-background">
             How many days of annual leave do new starters get?
           </p>
@@ -51,9 +57,9 @@ export function ChatPreview() {
               Facilities › Holiday closure 2026.docx
             </span>
           </div>
-        </div>
-        <div className="flex items-center gap-2 border-t border-border px-4 py-4">
-          <span className="flex h-10 flex-1 items-center rounded-full border border-input px-4 text-sm text-muted-foreground">
+        </CardContent>
+        <CardFooter className="gap-2 border-t">
+          <span className="flex h-10 flex-1 items-center rounded-full border border-input px-4 text-muted-foreground">
             Ask about anything in your tenant
           </span>
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground">
@@ -62,8 +68,8 @@ export function ChatPreview() {
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
             <ArrowUpIcon className="size-4" aria-hidden />
           </span>
-        </div>
-      </div>
+        </CardFooter>
+      </Card>
       <p className="mt-4 text-center font-mono text-xs text-muted-foreground">
         Preview
       </p>
