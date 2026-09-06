@@ -5,7 +5,7 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "app/globals.css",
+    "css": "src/styles/globals.css",
     "baseColor": "olive",
     "cssVariables": true,
     "prefix": ""
@@ -13,11 +13,11 @@
   "iconLibrary": "phosphor",
   "rtl": false,
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "components": "@deetz/ui/components",
+    "utils": "@deetz/ui/lib/utils",
+    "hooks": "@deetz/ui/hooks",
+    "lib": "@deetz/ui/lib",
+    "ui": "@deetz/ui/components"
   },
   "menuColor": "default",
   "menuAccent": "subtle",

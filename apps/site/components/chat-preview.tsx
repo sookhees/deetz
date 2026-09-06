@@ -11,7 +11,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@deetz/ui/components/card"
 
 export function ChatPreview() {
   return (

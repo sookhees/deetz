@@ -1,0 +1,10 @@
+{
+  "extends": "@deetz/typescript-config/react-library.json",
+  "compilerOptions": {
+    "paths": {
+      "@deetz/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["."],
+  "exclude": ["node_modules", "dist"]
+}

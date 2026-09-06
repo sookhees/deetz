@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { GithubLogoIcon } from "@phosphor-icons/react/ssr"
 
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@deetz/ui/components/button"
 import { site } from "@/lib/site"
 
 export function SiteHeader() {

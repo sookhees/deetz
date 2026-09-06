@@ -8,7 +8,7 @@ import {
 } from "@phosphor-icons/react/ssr"
 
 import { ChatPreview } from "@/components/chat-preview"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@deetz/ui/components/button"
 import { site } from "@/lib/site"
 
 const features = [

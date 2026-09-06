@@ -286,11 +286,16 @@ All in the app, all in Postgres.
 
 ## Where it runs
 
-Azure Container Apps, Postgres, Azure OpenAI and Key Vault, provisioned by
-`azd up` from Bicep templates. A Dockerfile and `output: "standalone"` make the
-image. The public demo is this landing page on Vercel until there is a tenant
-to point it at. Every environment variable is read inside a function, never at
-import, so the build needs none of them and CI runs without secrets.
+The repo is a workspace: `apps/deetz` is the product, `apps/site` is the
+landing page, and `packages/ui` is the design system both share, so a customer
+who clones the repo gets the product and the two cannot drift in look.
+
+The product runs on Azure Container Apps, Postgres, Azure OpenAI and Key
+Vault, provisioned by `azd up` from Bicep templates. A Dockerfile and
+`output: "standalone"` make the image. The site runs on Vercel until there is
+a tenant to point a demo at. Every environment variable is read inside a
+function, never at import, so the build needs none of them and CI runs
+without secrets.
 
 ## Later, in rough order
 

@@ -57,14 +57,35 @@ Arriving with the roadmap:
 - [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli) with Bicep templates, plus a Dockerfile for Azure Container Apps
 - [Puppeteer](https://pptr.dev) driving headless Chrome for the end-to-end suite
 
-## Running the scaffold
+## Repository layout
+
+One repo, two apps, one design system:
+
+| Path | What it is |
+| --- | --- |
+| `apps/deetz` | The product. What `azd up` installs into a tenant. |
+| `apps/site` | The landing page at [deetz-opal.vercel.app](https://deetz-opal.vercel.app). |
+| `packages/ui` | The shared shadcn components, theme tokens and styles both apps use. |
+| `packages/typescript-config` | Shared TypeScript settings. |
+
+Inside an app, everything about one feature lives under `features/<name>/`.
+
+## Running it
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Opens on [http://localhost:3000](http://localhost:3000). It is a placeholder page.
+That starts both apps: the product on [http://localhost:3001](http://localhost:3001)
+and the site on [http://localhost:3000](http://localhost:3000). To run one:
+
+```bash
+pnpm --filter deetz dev
+pnpm --filter site dev
+```
+
+`pnpm typecheck`, `pnpm lint` and `pnpm build` run across the whole workspace.
 
 ## Contributing
 
