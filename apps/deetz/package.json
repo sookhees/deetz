@@ -14,18 +14,18 @@
   "dependencies": {
     "@deetz/ui": "workspace:*",
     "@phosphor-icons/react": "^2.1.10",
-    "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@deetz/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^24.13.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.6",
-    "typescript": "^5"
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.3.4",
+    "typescript": "^5.9.3"
   }
 }
