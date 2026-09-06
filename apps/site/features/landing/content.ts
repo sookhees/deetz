@@ -28,6 +28,13 @@ export const features = [
   },
 ]
 
+export const questions = [
+  "Where's the Q3 budget?",
+  "Did legal reply yet?",
+  "Who's in the 3pm?",
+  "Was the outage resolved?",
+]
+
 export const steps = [
   {
     title: "Install",
