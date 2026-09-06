@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 
 import "@deetz/ui/globals.css"
+import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { ThemeProvider } from "@deetz/ui/components/theme-provider"
 import { site } from "@/lib/site"
@@ -35,6 +36,7 @@ export default function RootLayout({
         <ThemeProvider>
           <SiteHeader />
           <main className="pt-14">{children}</main>
+          <SiteFooter />
         </ThemeProvider>
       </body>
     </html>

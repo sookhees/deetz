@@ -96,3 +96,9 @@ larger than a fix, open an issue first so the shape can be agreed before the wor
 ## Licence
 
 [MIT](LICENSE).
+
+## Trademarks
+
+Deetz is an independent open-source project, not affiliated with or endorsed
+by Microsoft. Microsoft, Azure, Copilot, Entra, Microsoft 365, SharePoint and
+Teams are trademarks of the Microsoft group of companies.
