@@ -17,10 +17,9 @@ page. [docs/design.md](docs/design.md) says how the rest works, and
   indexed elsewhere or copied out.
 - **Sees what you see.** Every search runs as the signed-in person, so their
   permissions are the boundary.
-- **The admin chooses the apps, the person chooses theirs.** The admin switches
-  on SharePoint, OneDrive, mail, calendar, Teams and people for the
-  organisation. Each person picks everything or a subset on first sign-in.
-  Mail is off until they turn it on.
+- **The admin chooses the apps.** SharePoint, OneDrive, mail, calendar, Teams
+  and people, each a switch for the whole organisation, set once. People sign
+  in and ask. Nothing to set up.
 - **Speak or type.** Tap to talk and hear the answer read back as it is
   written. One conversation either way, on a laptop or a phone.
 - **Runs in your tenant.** One `azd up` provisions the app and its Azure OpenAI
@@ -46,14 +45,13 @@ In the repo today:
 - [Tailwind CSS](https://tailwindcss.com) 4 and [shadcn/ui](https://ui.shadcn.com) on [Base UI](https://base-ui.com) primitives, with [Phosphor](https://phosphoricons.com) icons and `next-themes` for light and dark
 - [pnpm](https://pnpm.io), ESLint and Prettier
 - GitHub Actions for typecheck, lint and build on every push, with Dependabot keeping dependencies current
-- [Vercel](https://vercel.com) for the public demo
+- [Vercel](https://vercel.com) for the landing page, and only that
 
 Arriving with the roadmap:
 
-- [Vercel AI SDK](https://ai-sdk.dev) on [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service): one deployment each for chat, transcription and speech, all resolved server-side
+- [Vercel AI SDK](https://ai-sdk.dev) on [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service): one deployment each for chat, transcription, speech and embeddings, all resolved server-side
 - [Microsoft Graph](https://learn.microsoft.com/graph) for the organisation's content, called as the signed-in person
-- Postgres for rate limits, spend ceilings and per-user quotas, so more than one container shares one set of counters
-- Azure Blob Storage behind a small storage adapter, with Vercel Blob as the second implementation for the demo
+- Postgres for sessions and tokens, rate limits, spend ceilings, per-user quotas and the turn log, so more than one container shares one set of counters; pgvector in the same database later, for a document cache and uploads
 - [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli) with Bicep templates, plus a Dockerfile for Azure Container Apps
 - [Puppeteer](https://pptr.dev) driving headless Chrome for the end-to-end suite
 

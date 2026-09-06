@@ -38,11 +38,11 @@ export const questions = [
 export const steps = [
   {
     title: "Install",
-    body: "Run azd up, consent once, choose the apps.",
+    body: "Run azd up, choose the apps, consent once.",
   },
   {
     title: "Sign in",
-    body: "The Microsoft account you already have. Pick what it may read.",
+    body: "The Microsoft account you already have. Nothing to set up.",
   },
   {
     title: "Ask",

@@ -25,17 +25,13 @@ account they already have.
 
 ### The admin, once
 
-1. **Install.** Run `azd up`. Bicep provisions the app, Postgres, the three
-   Azure OpenAI deployments (chat, transcription, speech), Key Vault and
-   storage into the subscription they are signed into, creates the Entra app
-   registration, and prints one consent link.
-2. **Consent.** One click, for the delegated read scopes listed in
-   [auth.md](auth.md). Every scope is "as the signed-in person".
-3. **Choose the apps.** The admin is whoever holds the `Deetz.Admin` app
-   role, which the install creates on the app registration and the admin
-   assigns to themselves or to a group in Entra. The token carries it as a
-   claim, Deetz checks the claim, and it is revoked where it was granted.
-   The admin page lists what Deetz can read from, each with a switch:
+1. **Install.** Run `azd up`. Bicep provisions the app, Postgres, the four
+   Azure OpenAI deployments (chat, transcription, speech, embeddings) and Key
+   Vault into the subscription they are signed into, creates the Entra app
+   registration with the `Deetz.Admin` role assigned to them, and opens the
+   admin page.
+2. **Choose the apps.** The admin page lists what Deetz can read from, each
+   with a switch:
 
    | App | What it gives people |
    | --- | --- |
@@ -46,7 +42,11 @@ account they already have.
    | Teams | Chats and channel messages they are in |
    | People | Who someone is, and who to ask |
 
-   An app switched off here is off for everyone.
+   An app switched off here is off for everyone. There are no per-person
+   switches: people sign in and ask.
+3. **Consent.** One click, for exactly the delegated read scopes those apps
+   need, listed in [auth.md](auth.md). Every scope is "as the signed-in
+   person". Switching another app on later is one more click here.
 4. **Set limits.** A daily spend ceiling, a per-person quota, and voice on or
    off. Defaults are pre-filled.
 5. **Name it.** The assistant's name, its tone, and one paragraph on what it
@@ -55,28 +55,27 @@ account they already have.
 6. **Share the link.** On the intranet, in SharePoint, in Teams, or pinned to
    phones through Intune as a web link.
 
-### The person, first time
+Who counts as admin, and how the role is checked, is in
+[auth.md](auth.md#who-is-admin).
+
+### The person
 
 Entra signs them in, with no prompt if they are already signed in to
-Microsoft 365. Deetz shows one screen: *what should I be able to read for
-you?* The apps the admin allowed, with two choices:
-
-- **Everything.** One tap. All the allowed apps, on.
-- **Pick.** A switch per app.
-
-Mail starts off in either case, and they turn it on if they want it. The
-choice is saved to their account and lives in their settings from then on.
+Microsoft 365, and they ask. Nothing to choose, nothing to set up. What Deetz
+can read for them is what the admin switched on, trimmed by Graph to what
+they can already open.
 
 ## Asking
 
 1. They type, or tap to speak. Speech is transcribed on the server.
 2. The server reads who they are from the session, checks their quota and the
-   day's ceiling, and gives the model one tool per app they have on.
+   day's ceiling, and gives the model the functions for the apps the admin
+   switched on.
 3. The model picks a tool, composes a query, and Deetz sends it to Graph's
    search endpoint as that person. Microsoft ranks the results and trims them
    to what the person can open.
-4. If the snippet is not enough, Deetz fetches the document and extracts its
-   text on the server.
+4. If the snippet is not enough, Deetz reads the document on the server, only
+   the part that bears on the question.
 5. The model answers and cites the document, with a link to it in
    Microsoft 365.
 6. Spoken answers are read back sentence by sentence as they are written.
@@ -85,14 +84,16 @@ choice is saved to their account and lives in their settings from then on.
 
 ## The agent and its functions
 
-The model is the agent in the middle. We write the functions, one per app,
-each small and fixed. The model chooses between them and writes the query.
+The model is the agent in the middle. We write the functions, one or two per
+app and one to read a document, each small and fixed. The model chooses
+between them and writes the query.
 The AI SDK runs the loop.
 
 ### What we write
 
-Eight functions. Each is one Graph request with the entity type hard-coded,
-and each returns its results shaped for the model.
+Eight functions. Seven fetch from one Graph endpoint each, with the entity
+type hard-coded, and one reads a document. Each returns its results shaped
+for the model.
 
 | Function | What it does | Graph call |
 | --- | --- | --- |
@@ -102,41 +103,57 @@ and each returns its results shaped for the model.
 | `newMail()` | What has arrived since they last looked | inbox listing, unread, newest first |
 | `searchTeams(query)` | Chats and channel messages they are in | search, `chatMessage` |
 | `calendar(from, to)` | What is on in a date range | calendar view |
-| `findPerson(query)` | Who someone is, their role, their manager | search, `person` |
-| `readDocument(id)` | Full text of one result, after a search | file download, text extracted on the server |
+| `findPerson(query)` | Who someone is, their title and department | search, `person` |
+| `readDocument(id, question)` | The passages of one result that bear on the question, after a search | content download or workbook API, text extracted on the server |
 
-A function knows its endpoint and its entity type. It knows nothing about the
-question. Graph only lets some entity types share one request, files and
-sites together but mail, Teams and calendar each on their own, which is why
-one function per app is the natural shape.
+A search function knows its endpoint and its entity type, and nothing about
+the question beyond the query the model wrote. Graph only lets some entity
+types share one request, files and sites together but mail and Teams each on
+their own, which is why the searches split by app. `readDocument` is the
+exception: it takes the question, because choosing which passages to send is
+its job.
 
 ### Reading a document
 
 Search finds the document; reading it is a second step, taken only when the
-snippet is not enough. Nothing is indexed by us. One document is fetched per
-question, read in memory, and discarded.
+snippet is not enough. Microsoft's index holds the full text of every file,
+but Graph hands back only the snippet, a few highlighted lines around the
+match. That answers "where is the Q3 budget" and often "what did the mail
+say"; it does not answer "what does the contract say about termination". The
+full extracts are exposed only through the Copilot Retrieval API, which needs
+a Copilot seat per person, so `readDocument` fetches the document itself. At
+most two documents are read per question, in memory, and discarded. Nothing
+is indexed by us.
 
-Where the text comes from depends on the app:
+Where the text comes from, and how much of it, depends on the type:
 
-| App | Read call | Text from |
+| Type | Read call | What reaches the model |
 | --- | --- | --- |
-| Mail, calendar, Teams | Graph | the response |
-| SharePoint pages, lists | Graph | the response |
-| Excel | Graph's workbook API | the response, as rows |
-| Word, PowerPoint, PDF | Graph's content call with `?format=pdf` | one PDF text library on the server |
+| Mail, calendar, Teams, pages, lists | Graph | The response, as is |
+| PowerPoint | Graph's content call with `?format=pdf` | Usually the whole thing; slides are short |
+| Word, PDF | Graph's content call with `?format=pdf` | The passages that bear on the question |
+| Excel | Graph's workbook API | Rows from one table, capped, or one computed result |
 
-Graph converts Word and PowerPoint to PDF server-side on that call, so the
-server needs a single extractor, chosen when the code is written and
-swappable behind `readDocument`. The Copilot Retrieval API would return text
-extracts through Graph directly, but it needs a Copilot seat per person, so
-it is not used.
+**Word and PDF** are the long ones. A hundred-page policy is around 65,000
+tokens, which would fit the window and still make a worse answer. So the
+server extracts the text with one PDF library, cuts it into chunks of a few
+hundred tokens, embeds them with the embedding deployment, and ranks them
+against the question with a keyword boost. The top five to eight chunks go to
+the model with their page numbers, and the citation is the document plus the
+page. Embedding a hundred pages costs a fraction of a cent. Nothing is kept.
 
-A long document never goes to the model whole. The passages around the
-search terms go, capped at a few thousand tokens, and the citation still
-points at the document. Spreadsheets go as rows, capped, preferring a named
-table when there is one. Any arithmetic over them is done by code, either
-Excel's own functions through the workbook API or a small calculate step on
-the server, and the model reads the result. It never does the adding.
+**Excel** is not text and is never downloaded. A finance workbook can run to
+millions of cells. The workbook API reads it like a database: list the sheets
+and tables, read the header row, let the model choose a table and a filter,
+fetch only those rows, capped, preferring a named table when there is one.
+Sums and lookups run in Excel itself through the API's functions endpoint, or
+in a small calculate step on the server, and the model reads the result. It
+never does the adding.
+
+The extractor and the ranking sit behind `readDocument`, chosen when the code
+is written and swappable. If measurement on real tenants shows long documents
+are slow to reopen, a read-through cache of opened documents lands later, see
+"Later"; the first version reads and discards.
 
 Beyond the functions, three things:
 
@@ -148,9 +165,11 @@ Beyond the functions, three things:
   returned, say so when nothing came back, keep spoken answers short, and
   what to do when asked for something it has no function for: say it cannot
   yet, and do the part it can.
-- **The wiring.** Which functions are in the list for this person, from
-  their switches and the admin's. A function that is not in the list does
-  not exist as far as the model is concerned.
+- **The wiring.** Which functions are in the list, from the admin's
+  switches: seven app functions plus the document reader when everything is
+  on. A
+  function that is not in the list does not exist as far as the model is
+  concerned.
 
 ### What the model does
 
@@ -162,8 +181,8 @@ text. For "what did Priya say in Teams about the budget?" its reply is:
 ```
 
 It picked the function whose description fitted, and it composed the query.
-No code of ours reads the question or decides which app it is about. Our
-code runs the function, hands the results back, and the model either
+No code of ours decides which app the question is about. Our code runs the
+function, hands the results back, and the model either
 answers, calls a second function if the first came up empty, reads a
 document by id, or asks which of two apps the person meant.
 
@@ -173,9 +192,8 @@ Mail queries use the syntax of the Outlook search box, so the model can form
 ### Adding an app
 
 One more row in the table: one function, one description, one switch on the
-admin page and the person's page. Nothing above the function layer changes,
-which is also what lets a Microsoft-provided tool server replace a function
-behind a switch one day without anything else noticing.
+admin page, and its scope in the consent. Nothing above the function layer
+changes.
 
 ## Under the hood
 
@@ -192,7 +210,7 @@ behind a switch one day without anything else noticing.
 
 ## Voice and models
 
-Azure OpenAI only. Three deployments in the organisation's subscription, all
+Azure OpenAI only. Four deployments in the organisation's subscription, all
 reached through the AI SDK's Azure provider by deployment name, so no call
 site names a model and the browser can never choose one:
 
@@ -201,9 +219,11 @@ site names a model and the browser can never choose one:
 | Hear | `gpt-4o-mini-transcribe` | `azure.transcription(...)` |
 | Think | the chat model: gpt-oss-120b by default, or a stronger model where a language or the routing needs it | `azure(...)` |
 | Speak | `gpt-4o-mini-tts` | `azure.speech(...)` |
+| Rank | `text-embedding-3-small`, for the passages of a long document | `azure.textEmbeddingModel(...)` |
 
 A spoken turn is `transcribe()` then `streamText()` then `generateSpeech()`,
-each a stable API. A typed turn touches only the chat deployment. Spoken
+each a stable API. A typed turn touches the chat deployment, and the
+embedding one only when a long document is read. Spoken
 replies are synthesised one sentence at a time as the text streams and
 queued through one `<audio>` element created inside the first tap, so the
 first sentence plays while the rest is still being written.
@@ -214,7 +234,9 @@ reasoning part; the transcript code and the speech queue treat it as such.
 
 Cost, from Azure's retail prices for a global deployment: gpt-oss-120b is
 $0.15 in and $0.60 out per million tokens; transcription is about $0.003 a
-minute of audio; speech is about $0.015 a minute of audio. A typed question
+minute of audio; speech is about $0.015 a minute of audio; embeddings are
+about $0.02 per million tokens, so ranking the passages of a long document
+adds nothing visible. A typed question
 with about 5,000 tokens of prompt, tools, history and results comes to about
 a tenth of a cent; a spoken one with a fifteen-second reply to about half a
 cent, two thirds of it the speech. That is roughly half the cost of the
@@ -248,7 +270,7 @@ Three ports stay open so a language is a row in a table rather than code:
 The language table has one row per language: code, recognition locale,
 voice, screen-strings file. The admin sets the organisation's main language
 once and ticks which rows are on. The person's language comes from their
-browser or their setting, with "auto" for people who switch mid-conversation.
+browser, with "auto" for people who switch mid-conversation.
 
 The one place language has to be managed is the search query. Microsoft's
 index matches text, so a Punjabi question about an English document needs an
@@ -292,23 +314,33 @@ who clones the repo gets the product and the two cannot drift in look.
 
 The product runs on Azure Container Apps, Postgres, Azure OpenAI and Key
 Vault, provisioned by `azd up` from Bicep templates. A Dockerfile and
-`output: "standalone"` make the image. The site runs on Vercel until there is
-a tenant to point a demo at. Every environment variable is read inside a
-function, never at import, so the build needs none of them and CI runs
-without secrets.
+`output: "standalone"` make the image. The site runs on Vercel, and only the
+site: Deetz hosts nothing else, and every running copy of the product is a
+customer's own install. Every environment variable is read inside a function,
+never at import, so the build needs none of them and CI runs without secrets.
 
 ## Later, in rough order
 
-1. Sending mail and Teams messages: drafted by the model, sent only when the
+1. A read-through cache of opened documents: chunks and vectors in pgvector
+   in the same Postgres, keyed by document id and etag, written only when
+   someone opens a document, served only after a Graph check that the asker
+   can still open it, dropped on a retention timer the admin sets. Behind an
+   admin switch. Built once real tenants show where reopening long documents
+   is slow, and not before.
+2. Sending mail and Teams messages: drafted by the model, sent only when the
    person presses Send, behind separate scopes that are off by default.
-2. Uploaded documents, indexed into pgvector in the same Postgres.
-3. A Teams app, through Teams single sign-on and on-behalf-of.
-4. The organisation's own systems as MCP servers, added by URL, called with a
+3. Uploaded documents, indexed into the same pgvector.
+4. A Teams app, through Teams single sign-on and on-behalf-of.
+5. The organisation's own systems as MCP servers, added by URL, called with a
    token for the signed-in person.
-5. An API for the organisation's own apps: the same `/api/ask`, taking a token
+6. An API for the organisation's own apps: the same `/api/ask`, taking a token
    issued to the person for Deetz.
-6. A widget for pages outside Deetz's domain, as an iframe with a small
-   loader.
+
+Not planned: a widget for other people's pages. The app is one responsive
+page, reached by link, and the Teams app covers the one place an embed was
+wanted. Not ever: Azure AI Search or a crawl of the tenant's content.
+Microsoft's index finds documents; pgvector holds only what people uploaded
+or opened, inside their own Postgres.
 
 ## Next
 

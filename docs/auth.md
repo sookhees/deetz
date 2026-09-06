@@ -1,17 +1,18 @@
 # Authentication and Graph access
 
 How a person signs in to Deetz, how Deetz reaches Microsoft Graph as that
-person, and what the admin has to create once. This is the plan for the first
-version. It is written before the code, so where the code disagrees, the code
-is right and this file needs updating.
+person, who counts as the admin, and what the install creates once. This is
+the plan for the first version. It is written before the code, so where the
+code disagrees, the code is right and this file needs updating.
 
 ## Goals
 
-- A person signs in with the Entra ID account they already have.
+- A person signs in with the Entra ID account they already have, and asks.
+  There is nothing for them to set up.
 - Every Graph call is made as that person, so every answer is trimmed to what
   they can already open. Deetz never has more access than the person asking.
-- No token ever reaches the browser, the widget, or the model.
-- The admin sets it up once: an app registration and one consent click.
+- No token ever reaches the browser or the model.
+- The admin sets it up once: pick the apps, one consent click.
 
 ## Approach
 
@@ -25,22 +26,19 @@ request, so the access token Entra returns is already a Graph token for that
 person. There is no intermediate token to exchange, which is why the
 on-behalf-of flow is not needed. See "Later" for when it comes back.
 
-Better Auth over Auth.js, for four reasons that each remove a piece of work:
+Better Auth over Auth.js, for three reasons that each remove a piece of work:
 
 - It stores the provider's access and refresh tokens in the database and
   refreshes them itself. Asking for a Graph token is one call.
 - Its Microsoft provider takes a client assertion, so a certificate works the
   same way a secret does.
-- Its bearer plugin can carry a session as a header instead of a cookie, which
-  is the way out of the third-party cookie problem if the widget ever has to
-  live on a foreign domain.
 - It is a stable release line with a database at its centre, which is where
   Deetz was going to end up anyway.
 
 ### Provider
 
 ```ts
-// lib/auth.ts
+// apps/deetz/features/auth/lib/auth.ts
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 
@@ -53,7 +51,7 @@ export const auth = betterAuth({
       // One of the two, never both. See "Credential".
       clientSecret: env.MICROSOFT_CLIENT_SECRET,
       clientAssertion: certificateAssertion,
-      scope: GRAPH_SCOPES,
+      scope: graphScopes(enabledApps),
     },
   },
 })
@@ -67,25 +65,41 @@ always send an email claim for managed accounts, and an email can change.
 
 ### Scopes
 
-Delegated, all read-only:
+Delegated, all read-only, one set per app:
 
-| Scope                  | For                                                  |
-| ---------------------- | ---------------------------------------------------- |
-| `openid profile email` | Sign-in and the person's name for the transcript     |
-| `offline_access`       | A refresh token, so a session outlives one hour      |
-| `User.Read`            | The person's own profile                             |
-| `Sites.Read.All`       | SharePoint pages and lists through the Search API    |
-| `Files.Read.All`       | Documents in SharePoint and OneDrive                 |
-| `Mail.Read`            | Messages, when the admin has mail switched on        |
+| App        | Scope                                   | For                                                          |
+| ---------- | --------------------------------------- | ------------------------------------------------------------ |
+| SharePoint | `Sites.Read.All`, `Files.Read.All`      | Sites, pages and lists through the Search API, and reading their documents |
+| OneDrive   | `Files.Read.All`                        | The person's own files                                       |
+| Mail       | `Mail.Read`                             | Messages, and search across the mailbox                      |
+| Calendar   | `Calendars.Read`                        | The calendar view                                            |
+| Teams      | `Chat.Read`, `ChannelMessage.Read.All`  | Chats and channel messages the person is in                  |
+| People     | `People.Read`, `User.ReadBasic.All`     | Who someone is: name, title, department                      |
 
-The scope set is fixed at consent time. The admin's source switches
-(SharePoint, OneDrive, mail) control which tools the model is offered, not
-which scopes are requested. A switched-off source is a tool the model cannot
-see.
+Always, for sign-in itself: `openid profile email offline_access User.Read`.
+That is the person's identity and name, a refresh token so a session outlives
+one hour, and their own profile.
 
-Admin consent is granted once for the tenant. It removes the per-person consent
-prompt whatever the tenant's user-consent policy is, and it is the only step in
-the install that is a human clicking a button on a Microsoft page.
+Answering who someone reports to needs `User.Read.All`, which reads the whole
+directory, so it stays out of the first version.
+
+The admin picks the apps first and consents to exactly the scopes those apps
+need. Switching another app on later is one more consent click. Switching one
+off needs nothing: its function leaves the list the model sees.
+
+Admin consent is granted once for the tenant, and again only when an app is
+added. It removes the per-person consent prompt whatever the tenant's
+user-consent policy is, and it is the only step in the install that is a
+human clicking a button on a Microsoft page.
+
+### Who is admin
+
+The install defines one app role on the registration, `Deetz.Admin`, and
+assigns it through Graph to the person who ran `azd up`, so nobody visits
+Entra for it. Entra puts the role in the token's `roles` claim; Deetz checks
+the claim on the admin pages and nowhere else. To add or remove an admin,
+assign or revoke the role in Entra, to a person or a group. Deetz keeps no
+admin list of its own.
 
 ### Tokens
 
@@ -93,7 +107,7 @@ Better Auth keeps the access token, refresh token and expiry on the person's
 account row. A server helper wraps its accessor:
 
 ```ts
-// lib/graph-token.ts
+// apps/deetz/features/auth/lib/graph-token.ts
 export async function getGraphToken(headers: Headers) {
   const session = await auth.api.getSession({ headers })
   if (!session) return null
@@ -106,7 +120,7 @@ export async function getGraphToken(headers: Headers) {
 
 If the stored token has expired, Better Auth refreshes it before returning it.
 Entra rotates refresh tokens, and the new one replaces the old. If a refresh
-fails, the helper returns nothing and the widget shows the sign-in state.
+fails, the helper returns nothing and the app shows the sign-in state.
 
 The chat route calls this once per request and hands the token to the tools
 through the tools context, so `execute()` can call Graph and the model has no
@@ -129,27 +143,22 @@ one without the admin doing anything. Switching to a certificate is a setting,
 not a reinstall. Exactly one of the two is configured; startup refuses to run
 with both or neither.
 
-## The widget
+## The session
 
-The session is a cookie on Deetz's origin. That decides where the widget can
-live in the first version:
+The session is a cookie on Deetz's origin. The app is one responsive page,
+opened in a browser on a laptop or a phone, or from a link on the intranet, in
+SharePoint or in Teams, so a first-party cookie is all it needs. Sign-in is a
+redirect to Deetz's own sign-in route and back.
 
-- **Works:** the widget on pages served from Deetz's own origin, or from a
-  subdomain that shares the parent domain. Intranet pages are the target.
-- **Does not work:** the widget embedded on an unrelated domain. That is a
-  third-party context, and Safari and Chrome block the cookie.
+## What the install creates
 
-Sign-in from the widget is a redirect to Deetz's own sign-in route and back.
-A popup is an option later if the redirect proves disruptive on long pages.
-
-## What the admin creates
-
-One app registration in Entra. The install does this for them where it can,
-and shows the consent page for the click it cannot do.
+One app registration in Entra. The install does this for the admin where it
+can, and shows the consent page for the click it cannot do.
 
 - Platform: Web. Redirect URI `https://{host}/api/auth/callback/microsoft`.
 - The credential, secret or certificate, as above.
-- API permissions: the delegated scopes above.
+- API permissions: the delegated scopes for the apps the admin chose.
+- The `Deetz.Admin` app role, assigned to the installing admin.
 - Admin consent, granted.
 
 Environment:
@@ -169,48 +178,39 @@ needs none of them and CI runs without secrets.
 
 ## Development tenant
 
-Nothing past the widget can be tested without a real tenant, so one is being
-set up for development. Creating the Entra tenant and attaching a Microsoft
-365 licence are portal steps. Everything after that is scripted with the Azure
-CLI and Graph, so the tenant can be rebuilt from scratch: two or three test
-users, a team site with a handful of documents, a couple of messages in a
-mailbox, the app registration with its permissions, and admin consent. The
-script lives in the repo once it exists, so a contributor with a tenant of
-their own can run it too.
+Nothing past the chat panel can be tested without a real tenant. How the
+development tenant is created and populated is in
+[design.md](design.md#next), so it lives in one place.
 
 ## Order of work
 
 1. Postgres locally, the Drizzle adapter, and Better Auth's generated schema.
    This is the first thing the database is used for.
-2. `lib/auth.ts` with the Microsoft provider, the route handler under
-   `app/api/auth/[...all]`, and a guard on the chat API.
-3. A signed-out state in the widget shell with one button: sign in with
-   Microsoft.
+2. `features/auth` in `apps/deetz`: the Microsoft provider, the route handler
+   under `app/api/auth/[...all]`, and a guard on the chat API.
+3. A signed-out state in the app with one button: sign in with Microsoft.
 4. `getGraphToken()`, and a first call to `/me` to prove the token is real and
    carries the Graph scopes. Then the Search API.
-5. The certificate path: the assertion function with the thumbprint header,
+5. The `Deetz.Admin` role: defined on the dev tenant's registration, read from
+   the claim, checked on the admin page.
+6. The certificate path: the assertion function with the thumbprint header,
    verified against the dev tenant.
-6. `.env.example` documenting the variables, both credential paths. Bicep
-   creates the registration in the setup work later.
+7. `.env.example` documenting the variables, both credential paths. Bicep
+   creates the registration and the role in the setup work later.
 
 ## Later
 
 - **Teams.** A Teams tab gets a token from Teams, not from a sign-in on our
   server. That token is for Deetz, so reaching Graph means on-behalf-of. Same
   `getGraphToken()` interface, a second way of filling it.
-- **Foreign domains.** A widget on a site that does not share Deetz's domain
-  cannot use the cookie. Better Auth's bearer plugin carries the session as a
-  header instead; the widget would sign in through a popup on Deetz's origin
-  and hold the token in memory. Its own docs say to use it with care, so it
-  waits until a customer needs it.
 - **Sign-out everywhere.** Front-channel logout to Entra, so signing out of
   Deetz also ends the Microsoft session where the admin wants that.
 
 ## Open questions
 
-- Whether the widget's session cookie should be scoped to the parent domain
-  so intranet subdomains share it, or kept to Deetz's host. Depends on where
-  the first customers put it.
 - Two things to confirm in the first hour against the dev tenant: that the
   Graph scopes requested at sign-in come back in the stored access token, and
   that the assertion header carries the thumbprint the way Entra wants it.
+- Whether the scope for an app the admin later switches off should be revoked
+  or left consented and unused. Leaving it is simpler; revoking is tidier for
+  an audit.
