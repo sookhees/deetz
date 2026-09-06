@@ -17,8 +17,8 @@ export function Hero() {
             </h1>
             <p className="max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
               {site.name} is an open-source assistant that answers from your
-              files, mail, calendar and Teams, as the person asking, inside your
-              own Azure tenant. No Copilot licence. Nothing leaves.
+              Microsoft 365, as the person asking, inside your own Azure
+              tenant. No Copilot licence. Nothing leaves.
             </p>
           </div>
           <ComposerPreview />
