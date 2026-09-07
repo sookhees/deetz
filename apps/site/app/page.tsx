@@ -1,4 +1,10 @@
-import { FeatureGrid, Hero, HowItWorks, Status } from "@/features/landing"
+import {
+  FeatureGrid,
+  Figures,
+  Hero,
+  HowItWorks,
+  Status,
+} from "@/features/landing"
 
 export default function Page() {
   return (
@@ -6,6 +12,7 @@ export default function Page() {
       <Hero />
       <FeatureGrid />
       <HowItWorks />
+      <Figures />
       <Status />
     </>
   )

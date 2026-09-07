@@ -1,14 +1,16 @@
-import { ArrowUpRightIcon, GithubLogoIcon } from "@phosphor-icons/react/ssr"
+import { GithubLogoIcon } from "@phosphor-icons/react/ssr"
 
 import { buttonVariants } from "@deetz/ui/components/button"
 import { site } from "@/lib/site"
 
+import { apps } from "../content"
 import { ComposerPreview } from "./composer-preview"
+import { Eyebrow } from "./labels"
 
 export function Hero() {
   return (
-    <section className="border-b border-border bg-muted/60">
-      <div className="mx-auto w-full max-w-7xl px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
+    <section>
+      <div className="mx-auto w-full max-w-7xl px-6 pt-16 pb-16 sm:pt-24 sm:pb-20">
         <div className="flex flex-col items-center gap-12">
           <div className="flex max-w-3xl flex-col items-center gap-6 text-center">
             <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">
@@ -32,15 +34,23 @@ export function Hero() {
               <GithubLogoIcon data-icon="inline-start" aria-hidden />
               View on GitHub
             </a>
-            <a
-              href={`${site.repo}/blob/main/docs/design.md`}
-              target="_blank"
-              rel="noreferrer"
-              className={buttonVariants({ variant: "ghost", size: "lg" })}
-            >
-              Read the design
-              <ArrowUpRightIcon data-icon="inline-end" aria-hidden />
-            </a>
+          </div>
+          <div className="flex flex-col items-center gap-4 pt-4">
+            <Eyebrow>Reads from</Eyebrow>
+            <ul className="flex flex-wrap justify-center gap-2">
+              {apps.map(({ icon: Icon, label }) => (
+                <li
+                  key={label}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-sm"
+                >
+                  <Icon
+                    className="size-4 text-chart-3 dark:text-chart-2"
+                    aria-hidden
+                  />
+                  {label}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
